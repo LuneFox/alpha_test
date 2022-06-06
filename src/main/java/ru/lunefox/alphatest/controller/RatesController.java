@@ -1,34 +1,31 @@
 package ru.lunefox.alphatest.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import ru.lunefox.alphatest.model.rates.ExchangeRate;
-import ru.lunefox.alphatest.model.rates.ExchangeRateClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import ru.lunefox.alphatest.model.rates.ExchangeRateClientBuilder;
+import ru.lunefox.alphatest.model.rates.ExchangeRateHistoryAnalyzer;
 
 
 @RestController
 @RequestMapping("/rates")
 public class RatesController {
 
-    private ExchangeRateClientBuilder builder;
+    private ExchangeRateClientBuilder clientBuilder;
 
     @Autowired
-    public void setBuilder(ExchangeRateClientBuilder builder) {
-        this.builder = builder;
+    public void setClientBuilder(ExchangeRateClientBuilder clientBuilder) {
+        this.clientBuilder = clientBuilder;
     }
 
     @GetMapping
-    public Object getRates() {
-        ExchangeRateClient client = builder.build("latest.json");
-        ExchangeRate rate = client.find();
-        return rate.getRates();
-    }
-
-    @GetMapping("/filter")
     public Object getRateForCurrency(@RequestParam(value = "currency") String currency) {
-        ExchangeRateClient client = builder.build("latest.json");
-        ExchangeRate rate = client.find();
-        return rate.getRates().get(currency.toUpperCase());
+        ExchangeRateHistoryAnalyzer analyzer = new ExchangeRateHistoryAnalyzer(clientBuilder);
+
+        return analyzer.isRateTodayHigherThanYesterday(currency)
+                ? "RICH"
+                : "BROKE";
     }
 }

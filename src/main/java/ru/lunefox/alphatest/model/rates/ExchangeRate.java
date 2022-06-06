@@ -6,7 +6,7 @@ import java.util.Map;
 
 @Data
 public class ExchangeRate {
-    private long timestamp;
+    private long timestamp; // UNIX UTC Seconds
     private String base;
     private Map<String, Double> rates;
 }
