@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope("singleton")
-@PropertySource("classpath:settings.properties")
+@PropertySource("classpath:general.properties")
 public class ExchangeRateClientBuilder {
 
     @Value("${rates.server}")
@@ -22,8 +22,12 @@ public class ExchangeRateClientBuilder {
     @Value("${rates.app_id}")
     private String appId;
 
+    @Value("${rates.relative_currency}")
+    private String base;
+
     public ExchangeRateClient build(String request) {
-        final String target = server + request + "?app_id=" + appId;
+        final String target = server + request + "?app_id=" + appId + "&base=" + base;
+
         return Feign.builder()
                 .client(new OkHttpClient())
                 .encoder(new GsonEncoder())
