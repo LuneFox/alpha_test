@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 import ru.lunefox.alphatest.model.gifs.Gif;
@@ -16,7 +15,6 @@ import ru.lunefox.alphatest.model.rates.ExchangeRateHistoryAnalyzer;
 
 
 @Controller
-@RequestMapping("/rates")
 public class RatesController {
 
     private ExchangeRateClientBuilder exchangeRateClientBuilder;
@@ -30,6 +28,11 @@ public class RatesController {
     }
 
     @GetMapping
+    public String getRoot() {
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot see this page.");
+    }
+
+    @GetMapping("/rates")
     public String getRateForCurrency(@RequestParam(value = "currency", required = false)
                                      String currency,
                                      Model model) {
