@@ -21,7 +21,7 @@ public class ExchangeRateHistoryAnalyzer {
     }
 
     public boolean isRateTodayHigherThanYesterday(String requestedCurrency) {
-        this.currency = requestedCurrency;
+        this.currency = requestedCurrency.toUpperCase();
 
         ExchangeRate todayRate = getTodayRate();
 
