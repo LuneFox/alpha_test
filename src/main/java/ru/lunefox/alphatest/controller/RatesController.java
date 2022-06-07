@@ -11,7 +11,6 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.lunefox.alphatest.model.gifs.Gif;
 import ru.lunefox.alphatest.model.gifs.GifClient;
 import ru.lunefox.alphatest.model.gifs.GifClientBuilder;
-import ru.lunefox.alphatest.model.gifs.Tag;
 import ru.lunefox.alphatest.model.rates.ExchangeRateClientBuilder;
 import ru.lunefox.alphatest.model.rates.ExchangeRateHistoryAnalyzer;
 
@@ -40,7 +39,7 @@ public class RatesController {
 
         boolean rich = isRateTodayHigherThanYesterday(currency);
         Gif gif = getGifAccordingToStatus(rich);
-        addGifAsModelAttribute(gif, model);
+        model.addAttribute("embed_url", gif.getEmbedUrl());
         return "gif";
     }
 
@@ -50,12 +49,7 @@ public class RatesController {
     }
 
     private Gif getGifAccordingToStatus(boolean rich) {
-        GifClient gifClient = gifClientBuilder.build(rich ? Tag.RICH : Tag.BROKE);
+        GifClient gifClient = gifClientBuilder.build(rich ? Gif.Tag.RICH : Gif.Tag.BROKE);
         return gifClient.find();
-    }
-
-    private void addGifAsModelAttribute(Gif gif, Model model) {
-        String embedUrl = (String) gif.getData().get("embed_url");
-        model.addAttribute("embed_url", embedUrl);
     }
 }

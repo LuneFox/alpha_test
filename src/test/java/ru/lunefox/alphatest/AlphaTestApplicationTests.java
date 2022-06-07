@@ -7,7 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.lunefox.alphatest.model.gifs.Gif;
 import ru.lunefox.alphatest.model.gifs.GifClient;
 import ru.lunefox.alphatest.model.gifs.GifClientBuilder;
-import ru.lunefox.alphatest.model.gifs.Tag;
 import ru.lunefox.alphatest.model.rates.ExchangeRate;
 import ru.lunefox.alphatest.model.rates.ExchangeRateClient;
 import ru.lunefox.alphatest.model.rates.ExchangeRateClientBuilder;
@@ -31,7 +30,7 @@ class AlphaTestApplicationTests {
     }
 
     @Test
-    public void testExchangeRate() {
+    public void exchangeRateLoads() {
         ExchangeRateClient latestRatesClient = exchangeRateClientBuilder.build("latest.json");
         ExchangeRate rate = latestRatesClient.find();
 
@@ -42,8 +41,8 @@ class AlphaTestApplicationTests {
     }
 
     @Test
-    public void testGif() {
-        GifClient gifClient = gifClientBuilder.build(Tag.RICH);
+    public void gifLoads() {
+        GifClient gifClient = gifClientBuilder.build(Gif.Tag.RICH);
         Gif gif = gifClient.find();
 
         Assertions.assertNotNull(gif.getData());

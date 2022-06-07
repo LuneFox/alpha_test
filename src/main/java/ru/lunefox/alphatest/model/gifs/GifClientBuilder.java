@@ -32,8 +32,8 @@ public class GifClientBuilder {
     private String brokeTag;
 
 
-    public GifClient build(Tag tag) {
-        String searchTag = (tag == Tag.RICH) ? richTag : brokeTag;
+    public GifClient build(Gif.Tag tag) {
+        String searchTag = (tag == Gif.Tag.RICH) ? richTag : brokeTag;
         final String target = server + "?api_key=" + apiKey + "&tag=" + searchTag + "&rating=" + rating;
 
         return Feign.builder()
