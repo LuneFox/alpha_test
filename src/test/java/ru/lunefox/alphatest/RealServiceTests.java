@@ -14,7 +14,8 @@ import ru.lunefox.alphatest.model.rates.ExchangeRateClientBuilder;
 import java.util.Map;
 
 @SpringBootTest
-class AlphaTestApplicationTests {
+public class RealServiceTests {
+
     private ExchangeRateClientBuilder exchangeRateClientBuilder;
     private GifClientBuilder gifClientBuilder;
 
@@ -26,18 +27,14 @@ class AlphaTestApplicationTests {
     }
 
     @Test
-    public void contextLoads() {
-    }
-
-    @Test
     public void exchangeRateLoads() {
-        ExchangeRateClient latestRatesClient = exchangeRateClientBuilder.build("latest.json");
-        ExchangeRate rate = latestRatesClient.find();
+        ExchangeRateClient exchangeRateClient = exchangeRateClientBuilder.build("latest.json");
+        ExchangeRate exchangeRate = exchangeRateClient.find();
 
-        Assertions.assertEquals(rate.getBase(), "USD");
-        Assertions.assertNotEquals(rate.getTimestamp(), 0);
-        Assertions.assertNotNull(rate.getRates());
-        Assertions.assertTrue(rate.getRates().containsKey("RUB"));
+        Assertions.assertEquals(exchangeRate.getBase(), "USD");
+        Assertions.assertNotEquals(exchangeRate.getTimestamp(), 0);
+        Assertions.assertNotNull(exchangeRate.getRates());
+        Assertions.assertTrue(exchangeRate.getRates().containsKey("RUB"));
     }
 
     @Test
@@ -45,12 +42,9 @@ class AlphaTestApplicationTests {
         GifClient gifClient = gifClientBuilder.build(Gif.Tag.RICH);
         Gif gif = gifClient.find();
 
-        Assertions.assertNotNull(gif.getData());
-
         Map<String, Object> data = gif.getData();
         String embedUrl = (String) data.get("embed_url");
 
         Assertions.assertTrue(embedUrl.contains("https://giphy.com/embed"));
     }
-
 }
