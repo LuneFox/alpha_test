@@ -6,4 +6,3 @@ public interface ExchangeRateClient {
     @RequestLine("GET")
     ExchangeRate find();
 }
-

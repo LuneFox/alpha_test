@@ -3,6 +3,8 @@ package ru.lunefox.alphatest.model.rates;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -19,8 +21,12 @@ public class ExchangeRateHistoryAnalyzer {
 
     public boolean isRateTodayHigherThanYesterday(String currency) {
         ExchangeRateClient latestClient = clientBuilder.build("latest.json");
-
         ExchangeRate latestRate = latestClient.find();
+
+        if (!latestRate.getRates().containsKey(currency)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong currency specified.");
+        }
+
         ExchangeRate yesterdayRate = getYesterdayRate(latestRate);
 
         Double todayCurrencyRate = latestRate.getRates().get(currency);
