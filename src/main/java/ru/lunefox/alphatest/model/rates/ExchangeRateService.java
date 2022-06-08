@@ -18,6 +18,10 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 @PropertySource("classpath:general.properties")
 public class ExchangeRateService {
+    private static OkHttpClient okHttpClient = new OkHttpClient();
+    private static GsonEncoder encoder = new GsonEncoder();
+    private static GsonDecoder decoder = new GsonDecoder();
+    private static Slf4jLogger logger = new Slf4jLogger(ExchangeRateClient.class);
 
     private interface ExchangeRateClient {
         @RequestLine("GET")
@@ -37,10 +41,10 @@ public class ExchangeRateService {
         final String target = server + request + "?app_id=" + appId + "&base=" + base;
 
         ExchangeRateClient client = Feign.builder()
-                .client(new OkHttpClient())
-                .encoder(new GsonEncoder())
-                .decoder(new GsonDecoder())
-                .logger(new Slf4jLogger(ExchangeRateClient.class))
+                .client(okHttpClient)
+                .encoder(encoder)
+                .decoder(decoder)
+                .logger(logger)
                 .logLevel(Logger.Level.FULL)
                 .target(ExchangeRateClient.class, target);
 

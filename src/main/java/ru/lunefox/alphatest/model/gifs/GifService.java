@@ -18,6 +18,10 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 @PropertySource("classpath:general.properties")
 public class GifService {
+    private static OkHttpClient okHttpClient = new OkHttpClient();
+    private static GsonEncoder encoder = new GsonEncoder();
+    private static GsonDecoder decoder = new GsonDecoder();
+    private static Slf4jLogger logger = new Slf4jLogger(GifClient.class);
 
     public interface GifClient {
         @RequestLine("GET")
@@ -45,10 +49,10 @@ public class GifService {
         final String target = server + "?api_key=" + apiKey + "&tag=" + searchTag + "&rating=" + rating;
 
         GifClient client = Feign.builder()
-                .client(new OkHttpClient())
-                .encoder(new GsonEncoder())
-                .decoder(new GsonDecoder())
-                .logger(new Slf4jLogger(GifClient.class))
+                .client(okHttpClient)
+                .encoder(encoder)
+                .decoder(decoder)
+                .logger(logger)
                 .logLevel(Logger.Level.FULL)
                 .target(GifClient.class, target);
 
