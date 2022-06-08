@@ -5,10 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import ru.lunefox.alphatest.model.DateTimeUtil;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 
 public class ExchangeRateHistoryAnalyzer {
     private String currency;
@@ -23,45 +22,43 @@ public class ExchangeRateHistoryAnalyzer {
     public boolean isRateTodayHigherThanYesterday(String requestedCurrency) {
         this.currency = requestedCurrency.toUpperCase();
 
-        ExchangeRate todayRate = getTodayRate();
+        ExchangeRate todayExchangeRate = getTodayExchangeRate();
 
-        if (!todayRate.containsCurrency(currency)) {
+        if (!todayExchangeRate.containsCurrency(currency)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong currency specified.");
         }
 
-        ExchangeRate yesterdayRate = getYesterdayRate(todayRate);
+        ExchangeRate yesterdayExchangeRate = getYesterdayExchangeRate(todayExchangeRate);
 
-        return compareRates(todayRate, yesterdayRate);
+        return compareExchangeRates(todayExchangeRate, yesterdayExchangeRate);
     }
 
-    private ExchangeRate getTodayRate() {
+    private ExchangeRate getTodayExchangeRate() {
         ExchangeRateClient todayClient = clientBuilder.build("latest.json");
         return todayClient.find();
     }
 
-    private ExchangeRate getYesterdayRate(ExchangeRate todayRate) {
-        long timestamp = todayRate.getTimestamp();
-        String dateFromDayBefore = getMinusDayFromTimestamp(timestamp);
-        ExchangeRateClient yesterdayClient = clientBuilder.build("historical/" + dateFromDayBefore + ".json");
+    private ExchangeRate getYesterdayExchangeRate(ExchangeRate todayRate) {
+        String historicalDate = getYesterdayDate(todayRate);
+        ExchangeRateClient yesterdayClient = clientBuilder.build("historical/" + historicalDate + ".json");
         return yesterdayClient.find();
     }
 
-    private String getMinusDayFromTimestamp(long utcSeconds) {
-        LocalDateTime now = LocalDateTime.ofEpochSecond(utcSeconds, 0, ZoneOffset.UTC);
-        LocalDateTime yesterday = now.minusDays(1);
-        return getDateAsString(yesterday);
+    @NotNull
+    private String getYesterdayDate(ExchangeRate todayRate) {
+        long todayTimeStamp = todayRate.getTimestamp();
+        LocalDateTime today = DateTimeUtil.secondsToLocalDateTime(todayTimeStamp);
+        LocalDateTime yesterday = today.minusDays(1);
+        return DateTimeUtil.formatLocalDateTimeAsString(yesterday);
     }
 
-    private String getDateAsString(LocalDateTime localDateTime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        return formatter.format(localDateTime);
-    }
+    private boolean compareExchangeRates(ExchangeRate todayRate, ExchangeRate yesterdayRate) {
+        Double todayValue = todayRate.getRates().get(currency);
+        Double yesterdayValue = yesterdayRate.getRates().get(currency);
 
-    private boolean compareRates(ExchangeRate todayRate, ExchangeRate yesterdayRate) {
-        Double today = todayRate.getRates().get(currency);
-        Double yesterday = yesterdayRate.getRates().get(currency);
-        logger.debug("today = " + today + " " + currency);
-        logger.debug("yesterday = " + yesterday + " " + currency);
-        return today > yesterday;
+        logger.debug("todayValue = " + todayValue + " " + currency);
+        logger.debug("yesterdayValue = " + yesterdayValue + " " + currency);
+
+        return todayValue > yesterdayValue;
     }
 }
