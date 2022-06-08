@@ -1,3 +1,8 @@
+## Live demo
+
+[http://poludo.ru:8080/richorbroke/rates?currency=rub](http://poludo.ru:8080/richorbroke/rates?currency=rub)
+
+
 ## Описание
 
 Создать сервис, который обращается к сервису курсов валют, и отображает gif:
