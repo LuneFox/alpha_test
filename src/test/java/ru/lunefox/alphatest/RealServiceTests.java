@@ -14,13 +14,12 @@ import java.util.Map;
 @SpringBootTest
 public class RealServiceTests {
 
-    private ExchangeRateService exchangeRateService;
-    private GifService gifService;
+    private final ExchangeRateService exchangeRateService;
+    private final GifService gifService;
 
     @Autowired
-    public void setExchangeRateClientBuilder(ExchangeRateService exchangeRateClientBuilder,
-                                             GifService gifService) {
-        this.exchangeRateService = exchangeRateClientBuilder;
+    public RealServiceTests(ExchangeRateService exchangeRateService, GifService gifService) {
+        this.exchangeRateService = exchangeRateService;
         this.gifService = gifService;
     }
 

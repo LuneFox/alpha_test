@@ -14,12 +14,12 @@ import ru.lunefox.alphatest.model.rates.ExchangeRateHistoryAnalyzer;
 
 
 @Controller
-public class RatesController {
+public class ServiceController {
     private final GifService gifService;
     private final ExchangeRateHistoryAnalyzer historyAnalyzer;
 
     @Autowired
-    public RatesController(ExchangeRateService exchangeRateService, GifService gifService) {
+    public ServiceController(ExchangeRateService exchangeRateService, GifService gifService) {
         this.gifService = gifService;
         this.historyAnalyzer = new ExchangeRateHistoryAnalyzer(exchangeRateService);
     }
@@ -30,15 +30,16 @@ public class RatesController {
     }
 
     @GetMapping("/rates")
-    public String getRateForCurrency(@RequestParam(value = "currency", required = false)
-                                     String currency,
-                                     Model model) {
+    public String getGifForCurrencyHistory(@RequestParam(value = "currency", required = false) String currency,
+                                           Model model) {
         if (currency == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parameter 'currency' is not present.");
         }
 
-        boolean rich = historyAnalyzer.isRateTodayHigherThanYesterday(currency);
-        Gif gif = gifService.getGif(rich ? Gif.Tag.RICH : Gif.Tag.BROKE);
+        Gif gif = gifService.getGif(historyAnalyzer.isRateTodayHigherThanYesterday(currency)
+                ? Gif.Tag.RICH
+                : Gif.Tag.BROKE);
+
         model.addAttribute("embed_url", gif.getEmbedUrl());
         return "gif";
     }
