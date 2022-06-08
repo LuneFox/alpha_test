@@ -13,10 +13,10 @@ public class ExchangeRateHistoryAnalyzer {
     private String currency;
 
     private static final Logger logger = LoggerFactory.getLogger(ExchangeRateHistoryAnalyzer.class);
-    private final ExchangeRateClientBuilder clientBuilder;
+    private final ExchangeRateService service;
 
-    public ExchangeRateHistoryAnalyzer(ExchangeRateClientBuilder clientBuilder) {
-        this.clientBuilder = clientBuilder;
+    public ExchangeRateHistoryAnalyzer(ExchangeRateService service) {
+        this.service = service;
     }
 
     public boolean isRateTodayHigherThanYesterday(String requestedCurrency) {
@@ -34,14 +34,12 @@ public class ExchangeRateHistoryAnalyzer {
     }
 
     private ExchangeRate getTodayExchangeRate() {
-        ExchangeRateClient todayClient = clientBuilder.build("latest.json");
-        return todayClient.find();
+        return service.getExchangeRate("latest.json");
     }
 
     private ExchangeRate getYesterdayExchangeRate(ExchangeRate todayRate) {
         String historicalDate = getYesterdayDate(todayRate);
-        ExchangeRateClient yesterdayClient = clientBuilder.build("historical/" + historicalDate + ".json");
-        return yesterdayClient.find();
+        return service.getExchangeRate("historical/" + historicalDate + ".json");
     }
 
     @NotNull

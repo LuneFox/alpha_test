@@ -2,6 +2,7 @@ package ru.lunefox.alphatest.model.rates;
 
 import feign.Feign;
 import feign.Logger;
+import feign.RequestLine;
 import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
 import feign.okhttp.OkHttpClient;
@@ -16,7 +17,12 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("singleton")
 @PropertySource("classpath:general.properties")
-public class ExchangeRateClientBuilder {
+public class ExchangeRateService {
+
+    private interface ExchangeRateClient {
+        @RequestLine("GET")
+        ExchangeRate find();
+    }
 
     @Value("${rates.server}")
     private String server;
@@ -27,15 +33,17 @@ public class ExchangeRateClientBuilder {
     @Value("${rates.relative_currency}")
     private String base;
 
-    public ExchangeRateClient build(String request) {
+    public ExchangeRate getExchangeRate(String request) {
         final String target = server + request + "?app_id=" + appId + "&base=" + base;
 
-        return Feign.builder()
+        ExchangeRateClient client = Feign.builder()
                 .client(new OkHttpClient())
                 .encoder(new GsonEncoder())
                 .decoder(new GsonDecoder())
                 .logger(new Slf4jLogger(ExchangeRateClient.class))
                 .logLevel(Logger.Level.FULL)
                 .target(ExchangeRateClient.class, target);
+
+        return client.find();
     }
 }

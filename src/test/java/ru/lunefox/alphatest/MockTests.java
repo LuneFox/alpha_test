@@ -8,11 +8,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ru.lunefox.alphatest.model.gifs.Gif;
-import ru.lunefox.alphatest.model.gifs.GifClient;
-import ru.lunefox.alphatest.model.gifs.GifClientBuilder;
+import ru.lunefox.alphatest.model.gifs.GifService;
 import ru.lunefox.alphatest.model.rates.ExchangeRate;
-import ru.lunefox.alphatest.model.rates.ExchangeRateClient;
-import ru.lunefox.alphatest.model.rates.ExchangeRateClientBuilder;
+import ru.lunefox.alphatest.model.rates.ExchangeRateService;
 
 import java.util.Map;
 
@@ -69,13 +67,12 @@ public class MockTests {
 
     @Test
     public void exchangeRateServiceMockTest() {
-        ExchangeRateClientBuilder exchangeRateClientBuilder = new ExchangeRateClientBuilder();
-        exchangeRateClientBuilder.setBase("USD");
-        exchangeRateClientBuilder.setServer("http://localhost:9998/");
-        exchangeRateClientBuilder.setAppId("test_app_id");
+        ExchangeRateService service = new ExchangeRateService();
+        service.setBase("USD");
+        service.setServer("http://localhost:9998/");
+        service.setAppId("test_app_id");
 
-        ExchangeRateClient client = exchangeRateClientBuilder.build("latest.json");
-        ExchangeRate exchangeRate = client.find();
+        ExchangeRate exchangeRate = service.getExchangeRate("latest.json");
 
         Assertions.assertEquals(exchangeRate.getBase(), "USD");
         Assertions.assertNotEquals(exchangeRate.getTimestamp(), 0);
@@ -85,14 +82,13 @@ public class MockTests {
 
     @Test
     public void gifServiceMockTest() {
-        GifClientBuilder gifClientBuilder = new GifClientBuilder();
-        gifClientBuilder.setServer("http://localhost:9998");
-        gifClientBuilder.setApiKey("test_key");
-        gifClientBuilder.setRichTag("rich");
-        gifClientBuilder.setRating("g");
+        GifService gifService = new GifService();
+        gifService.setServer("http://localhost:9998");
+        gifService.setApiKey("test_key");
+        gifService.setRichTag("rich");
+        gifService.setRating("g");
 
-        GifClient gifClient = gifClientBuilder.build(Gif.Tag.RICH);
-        Gif gif = gifClient.find();
+        Gif gif = gifService.getGif(Gif.Tag.RICH);
         Map<String, Object> data = gif.getData();
         String embedUrl = (String) data.get("embed_url");
 

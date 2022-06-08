@@ -2,6 +2,7 @@ package ru.lunefox.alphatest.model.gifs;
 
 import feign.Feign;
 import feign.Logger;
+import feign.RequestLine;
 import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
 import feign.okhttp.OkHttpClient;
@@ -16,7 +17,12 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("singleton")
 @PropertySource("classpath:general.properties")
-public class GifClientBuilder {
+public class GifService {
+
+    public interface GifClient {
+        @RequestLine("GET")
+        Gif find();
+    }
 
     @Value("${giphy.server}")
     private String server;
@@ -34,16 +40,18 @@ public class GifClientBuilder {
     private String brokeTag;
 
 
-    public GifClient build(Gif.Tag tag) {
+    public Gif getGif(Gif.Tag tag) {
         String searchTag = (tag == Gif.Tag.RICH) ? richTag : brokeTag;
         final String target = server + "?api_key=" + apiKey + "&tag=" + searchTag + "&rating=" + rating;
 
-        return Feign.builder()
+        GifClient client = Feign.builder()
                 .client(new OkHttpClient())
                 .encoder(new GsonEncoder())
                 .decoder(new GsonDecoder())
                 .logger(new Slf4jLogger(GifClient.class))
                 .logLevel(Logger.Level.FULL)
                 .target(GifClient.class, target);
+
+        return client.find();
     }
 }

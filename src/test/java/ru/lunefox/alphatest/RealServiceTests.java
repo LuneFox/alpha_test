@@ -5,31 +5,28 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.lunefox.alphatest.model.gifs.Gif;
-import ru.lunefox.alphatest.model.gifs.GifClient;
-import ru.lunefox.alphatest.model.gifs.GifClientBuilder;
+import ru.lunefox.alphatest.model.gifs.GifService;
 import ru.lunefox.alphatest.model.rates.ExchangeRate;
-import ru.lunefox.alphatest.model.rates.ExchangeRateClient;
-import ru.lunefox.alphatest.model.rates.ExchangeRateClientBuilder;
+import ru.lunefox.alphatest.model.rates.ExchangeRateService;
 
 import java.util.Map;
 
 @SpringBootTest
 public class RealServiceTests {
 
-    private ExchangeRateClientBuilder exchangeRateClientBuilder;
-    private GifClientBuilder gifClientBuilder;
+    private ExchangeRateService exchangeRateService;
+    private GifService gifService;
 
     @Autowired
-    public void setExchangeRateClientBuilder(ExchangeRateClientBuilder exchangeRateClientBuilder,
-                                             GifClientBuilder gifClientBuilder) {
-        this.exchangeRateClientBuilder = exchangeRateClientBuilder;
-        this.gifClientBuilder = gifClientBuilder;
+    public void setExchangeRateClientBuilder(ExchangeRateService exchangeRateClientBuilder,
+                                             GifService gifService) {
+        this.exchangeRateService = exchangeRateClientBuilder;
+        this.gifService = gifService;
     }
 
     @Test
     public void exchangeRateLoads() {
-        ExchangeRateClient exchangeRateClient = exchangeRateClientBuilder.build("latest.json");
-        ExchangeRate exchangeRate = exchangeRateClient.find();
+        ExchangeRate exchangeRate = exchangeRateService.getExchangeRate("latest.json");
 
         Assertions.assertEquals(exchangeRate.getBase(), "USD");
         Assertions.assertNotEquals(exchangeRate.getTimestamp(), 0);
@@ -39,8 +36,7 @@ public class RealServiceTests {
 
     @Test
     public void gifLoads() {
-        GifClient gifClient = gifClientBuilder.build(Gif.Tag.RICH);
-        Gif gif = gifClient.find();
+        Gif gif = gifService.getGif(Gif.Tag.RICH);
 
         Map<String, Object> data = gif.getData();
         String embedUrl = (String) data.get("embed_url");

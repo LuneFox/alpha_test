@@ -8,23 +8,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 import ru.lunefox.alphatest.model.gifs.Gif;
-import ru.lunefox.alphatest.model.gifs.GifClient;
-import ru.lunefox.alphatest.model.gifs.GifClientBuilder;
-import ru.lunefox.alphatest.model.rates.ExchangeRateClientBuilder;
+import ru.lunefox.alphatest.model.gifs.GifService;
+import ru.lunefox.alphatest.model.rates.ExchangeRateService;
 import ru.lunefox.alphatest.model.rates.ExchangeRateHistoryAnalyzer;
 
 
 @Controller
 public class RatesController {
-
-    private ExchangeRateClientBuilder exchangeRateClientBuilder;
-    private GifClientBuilder gifClientBuilder;
+    private final GifService gifService;
+    private final ExchangeRateHistoryAnalyzer historyAnalyzer;
 
     @Autowired
-    public void setExchangeRateClientBuilder(ExchangeRateClientBuilder exchangeRateClientBuilder,
-                                             GifClientBuilder gifClientBuilder) {
-        this.exchangeRateClientBuilder = exchangeRateClientBuilder;
-        this.gifClientBuilder = gifClientBuilder;
+    public RatesController(ExchangeRateService exchangeRateService, GifService gifService) {
+        this.gifService = gifService;
+        this.historyAnalyzer = new ExchangeRateHistoryAnalyzer(exchangeRateService);
     }
 
     @GetMapping
@@ -40,19 +37,9 @@ public class RatesController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parameter 'currency' is not present.");
         }
 
-        boolean rich = isRateTodayHigherThanYesterday(currency);
-        Gif gif = getGifAccordingToStatus(rich);
+        boolean rich = historyAnalyzer.isRateTodayHigherThanYesterday(currency);
+        Gif gif = gifService.getGif(rich ? Gif.Tag.RICH : Gif.Tag.BROKE);
         model.addAttribute("embed_url", gif.getEmbedUrl());
         return "gif";
-    }
-
-    private boolean isRateTodayHigherThanYesterday(String currency) {
-        ExchangeRateHistoryAnalyzer analyzer = new ExchangeRateHistoryAnalyzer(exchangeRateClientBuilder);
-        return analyzer.isRateTodayHigherThanYesterday(currency);
-    }
-
-    private Gif getGifAccordingToStatus(boolean rich) {
-        GifClient gifClient = gifClientBuilder.build(rich ? Gif.Tag.RICH : Gif.Tag.BROKE);
-        return gifClient.find();
     }
 }
