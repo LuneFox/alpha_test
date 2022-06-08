@@ -37,14 +37,14 @@ public class ExchangeRateHistoryAnalyzer {
         return service.getExchangeRate("latest.json");
     }
 
-    private ExchangeRate getYesterdayExchangeRate(ExchangeRate todayRate) {
-        String historicalDate = getYesterdayDate(todayRate);
+    private ExchangeRate getYesterdayExchangeRate(ExchangeRate todayExchangeRate) {
+        String historicalDate = getDateOfDayBefore(todayExchangeRate);
         return service.getExchangeRate("historical/" + historicalDate + ".json");
     }
 
     @NotNull
-    private String getYesterdayDate(ExchangeRate todayRate) {
-        long todayTimeStamp = todayRate.getTimestamp();
+    private String getDateOfDayBefore(ExchangeRate exchangeRate) {
+        long todayTimeStamp = exchangeRate.getTimestamp();
         LocalDateTime today = DateTimeUtil.secondsToLocalDateTime(todayTimeStamp);
         LocalDateTime yesterday = today.minusDays(1);
         return DateTimeUtil.formatLocalDateTimeAsString(yesterday);
