@@ -9,8 +9,6 @@ import ru.lunefox.alphatest.model.gifs.GifService;
 import ru.lunefox.alphatest.model.rates.ExchangeRate;
 import ru.lunefox.alphatest.model.rates.ExchangeRateService;
 
-import java.util.Map;
-
 @SpringBootTest
 public class RealServiceTests {
 
@@ -36,9 +34,7 @@ public class RealServiceTests {
     @Test
     public void gifLoads() {
         Gif gif = gifService.getGif(Gif.Tag.RICH);
-
-        Map<String, Object> data = gif.getData();
-        String embedUrl = (String) data.get("embed_url");
+        String embedUrl = gif.getEmbedUrl();
 
         Assertions.assertTrue(embedUrl.contains("https://giphy.com/embed"));
     }

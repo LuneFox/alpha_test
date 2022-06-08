@@ -12,8 +12,6 @@ import ru.lunefox.alphatest.model.gifs.GifService;
 import ru.lunefox.alphatest.model.rates.ExchangeRate;
 import ru.lunefox.alphatest.model.rates.ExchangeRateService;
 
-import java.util.Map;
-
 public class MockServiceTests {
     private static final WireMockServer server = new WireMockServer(9998);
 
@@ -23,6 +21,11 @@ public class MockServiceTests {
         WireMock.configureFor("localhost", 9998);
         prepareExchangeRateServiceMockResponse();
         prepareGifServiceMockResponse();
+    }
+
+    @AfterAll
+    public static void stopServer() {
+        server.stop();
     }
 
     private static void prepareExchangeRateServiceMockResponse() {
@@ -89,14 +92,8 @@ public class MockServiceTests {
         service.setRating("g");
 
         Gif gif = service.getGif(Gif.Tag.RICH);
-        Map<String, Object> data = gif.getData();
-        String embedUrl = (String) data.get("embed_url");
+        String embedUrl = gif.getEmbedUrl();
 
         Assertions.assertTrue(embedUrl.contains("https://giphy.com/embed"));
-    }
-
-    @AfterAll
-    public static void stopServer() {
-        server.stop();
     }
 }
