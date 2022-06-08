@@ -30,7 +30,7 @@ public class ExchangeRateHistoryAnalyzer {
 
         ExchangeRate yesterdayExchangeRate = getYesterdayExchangeRate(todayExchangeRate);
 
-        return compareExchangeRates(todayExchangeRate, yesterdayExchangeRate);
+        return isHigher(todayExchangeRate, yesterdayExchangeRate);
     }
 
     private ExchangeRate getTodayExchangeRate() {
@@ -50,7 +50,7 @@ public class ExchangeRateHistoryAnalyzer {
         return DateTimeUtil.formatLocalDateTimeAsString(yesterday);
     }
 
-    private boolean compareExchangeRates(ExchangeRate todayRate, ExchangeRate yesterdayRate) {
+    private boolean isHigher(ExchangeRate todayRate, ExchangeRate yesterdayRate) {
         Double todayValue = todayRate.getRates().get(currency);
         Double yesterdayValue = yesterdayRate.getRates().get(currency);
 
