@@ -2,6 +2,7 @@
 
 [http://poludo.ru:8080/richorbroke/rates?currency=rub](http://poludo.ru:8080/richorbroke/rates?currency=rub)
 
+___
 
 ## Описание
 
