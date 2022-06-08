@@ -46,12 +46,15 @@ public class ExchangeRateHistoryAnalyzer {
         return yesterdayClient.find();
     }
 
-    @NotNull
     private String getMinusDayFromTimestamp(long utcSeconds) {
         LocalDateTime now = LocalDateTime.ofEpochSecond(utcSeconds, 0, ZoneOffset.UTC);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDateTime yesterday = now.minusDays(1);
-        return formatter.format(yesterday);
+        return getDateAsString(yesterday);
+    }
+
+    private String getDateAsString(LocalDateTime localDateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return formatter.format(localDateTime);
     }
 
     private boolean compareRates(ExchangeRate todayRate, ExchangeRate yesterdayRate) {
